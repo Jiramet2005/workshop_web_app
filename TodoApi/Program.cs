@@ -1,0 +1,46 @@
+using TodoApi.Dtos;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddOpenApi();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
+
+app.UseHttpsRedirection();
+
+var todos = new List<TodoGetDto>
+{
+    new(1, "Learn Minimal API", false),
+    new(2, "Learn Vue", false),
+    new(3, "Build a web API", false),
+    new(4, "Jiramet sudlor", true),
+};
+
+app.MapGet("/api/todos", () => Results.Ok(todos));
+app.MapGet("/api/todos/{id}", (int id) =>
+{
+    var todo = todos.FirstOrDefault(t => t.id == id);
+
+    return todo is not null ? Results.Ok(todo) : Results.NotFound();
+
+});
+app.MapPost("/api/todos", (TodoPostDto dto) =>
+{
+    var nextid = todos.Count == 0 ? 1 : todos.Max(t => t.id) + 1;
+    
+    var todo = new TodoGetDto(nextid, dto.Title, false);
+    todos.Add(todo);
+
+    return Results.Created($"/api/todos/{nextid}", todo);
+    
+});
+
+app.Run();
