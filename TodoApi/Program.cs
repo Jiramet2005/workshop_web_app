@@ -24,7 +24,9 @@ var todos = new List<TodoGetDto>
     new(4, "Jiramet sudlor", true),
 };
 
-app.MapGet("/api/todos", () => Results.Ok(todos));
+app.MapGet("/api/todos", () => 
+Results.Ok(todos));
+
 app.MapGet("/api/todos/{id}", (int id) =>
 {
     var todo = todos.FirstOrDefault(t => t.id == id);
