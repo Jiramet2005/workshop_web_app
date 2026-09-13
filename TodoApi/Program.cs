@@ -105,15 +105,14 @@ var todoGroup = app.MapGroup("/api/todos").WithTags("Todos");
 
 todoGroup.MapGet("/", async (AppDbContext db) =>
 {
-    var todos = await db.TodoItems.ToListAsync();
+    var todos = await db.Todos.ToListAsync();
     return todos.Count == 0 ? Results.NotFound() : Results.Ok(todos);
 });
 
 todoGroup.MapPost("/", async (AppDbContext db, TodoPostDto dto) =>
 {
-    var lastTodo = await db.TodoItems.OrderByDescending(t => t.Id).FirstOrDefaultAsync();
+    var lastTodo = await db.Todos.OrderByDescending(t => t.Id).FirstOrDefaultAsync();
     var nextId = lastTodo is null ? 1 : lastTodo.Id + 1;
-
     var todo = new TodoItem
     {
         Id = nextId,
@@ -122,7 +121,7 @@ todoGroup.MapPost("/", async (AppDbContext db, TodoPostDto dto) =>
         CreatedAt = DateTime.UtcNow
     };
 
-    db.TodoItems.Add(todo);
+    db.Todos.Add(todo);
     await db.SaveChangesAsync();
 
     var todoGetDto = new TodoGetDto(todo.Id, todo.Title, todo.IsCOmpleted);
