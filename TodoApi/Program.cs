@@ -106,6 +106,13 @@ var todoGroup = app.MapGroup("/api/todos").WithTags("Todos");
 todoGroup.MapGet("/", async (AppDbContext db) =>
 {
     var todos = await db.Todos.ToListAsync();
+
+    var todoGetDtos = todos.Select(t => 
+                         new TodoGetDto(
+                            t.Id, 
+                            t.Title, 
+                            t.IsCOmpleted));
+
     return todos.Count == 0 ? Results.NotFound() : Results.Ok(todos);
 });
 
